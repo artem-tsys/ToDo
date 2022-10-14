@@ -1,7 +1,7 @@
 {
   "env": {
     "browser": true,
-    "es6": true,
+    "es2021": true,
     "node": true
   },
   "extends": [
@@ -9,8 +9,9 @@
     "plugin:import/errors",
     "plugin:import/warnings",
     "plugin:react-hooks/recommended",
-    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended",
     "airbnb",
+	  "airbnb-typescript",
     "prettier"
   ],
   "settings": {
@@ -18,14 +19,16 @@
       "version": "detect"
     }
   },
+	"parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 2020,
+    "ecmaVersion": 2021,
     "sourceType": "module",
+	  "project": ["./tsconfig.json"],
     "ecmaFeatures": {
       "jsx": true
     }
   },
-  "plugins": ["react"],
+  "plugins": ["react", "@typescript-eslint"],
   "rules": {
     "react/jsx-filename-extension": "off",
     "react/prop-types": "off",
@@ -69,7 +72,17 @@
     ],
 
     "import/prefer-default-export": "off",
-    "import/no-extraneous-dependencies": "off",
+//    "import/no-extraneous-dependencies": "off",
+	  "import/extensions": [
+		  "error",
+		  "ignorePackages",
+		  {
+			  "js": "never",
+			  "jsx": "never",
+			  "ts": "never",
+			  "tsx": "never"
+		  }
+	  ],
 
     "react/require-default-props": "off",
     "react/button-has-type": "off",
@@ -79,12 +92,12 @@
     "react/no-danger": "off",
     "react/no-array-index-key": "off",
     "react/state-in-constructor": "off",
-    "react/function-component-definition": [
-      2,
-      {
-        "namedComponents": "arrow-function"
-      }
-    ],
+//    "react/function-component-definition": [
+//      2,
+//      {
+//        "namedComponents": "arrow-function"
+//      }
+//    ],
 
     "jsx-a11y/anchor-is-valid": "off",
     "jsx-a11y/img-redundant-alt": "off",

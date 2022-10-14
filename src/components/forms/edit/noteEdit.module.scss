@@ -1,0 +1,71 @@
+.note {
+  display: flex;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+
+  &:last-child {
+    border-bottom: 1px solid #ddd;
+  }
+}
+
+.formField{
+  display: flex;
+  padding: 5px;
+  border-left: 1px solid #ddd;
+
+  &:first-child {
+    border-left: none;
+  }
+
+  &Name {
+    width: 30%;
+  }
+
+  &Phone{
+    width: 35%;
+  }
+}
+
+.formButtons {
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+  min-width: 20%;
+}
+
+.actions {
+  text-align: center;
+}
+
+.btn {
+  padding: 5px 10px;
+  color: #3932a1;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: Roboto , sans-serif;
+  text-transform: capitalize;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  background: #ddd;
+  margin: 0 10px 0 0;
+  cursor: pointer;
+
+  &:disabled {
+    background: #bdbdbd;
+    color: #6f6bad;
+    cursor: no-drop;
+  }
+}
+
+.field {
+  &:disabled {
+    border: none;
+    background: none;
+  }
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    appearance: none;
+  }
+}

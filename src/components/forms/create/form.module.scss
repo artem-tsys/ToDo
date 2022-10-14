@@ -1,0 +1,48 @@
+.form {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+  padding: 20px 30px;
+}
+
+.field {
+  height: auto;
+  width: 100%;
+  margin-right: 20px;
+
+  &Wrap {
+    display: flex;
+    position: relative;
+    min-width: 30%;
+  }
+
+  &Error {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transform: translateY(100%);
+    display: inline-block;
+    font-size: 12px;
+    color: #f22;
+  }
+}
+
+.btn {
+  display: inline-block;
+  height: 30px;
+  width: auto;
+  text-align: center;
+  padding: 0 20px;
+  border-radius: 5px;
+  background: #3932a1;
+  color: #b0deea;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+
+  &:disabled {
+    background: #716cb6;
+    color: #a7c4cb;
+    cursor: no-drop;
+  }
+}
