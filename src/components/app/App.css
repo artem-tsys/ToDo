@@ -1,0 +1,11 @@
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 80%;
+  max-width: 1200px;
+  margin: 30px auto;
+  border: 1px solid #262626;
+  box-shadow: 0 0 20px #282c34;
+}
