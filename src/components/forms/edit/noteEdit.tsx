@@ -25,9 +25,9 @@ function NoteEdit(props: Props): JSX.Element {
 
     const formik = useFormik({
         initialValues: props.note,
-        onSubmit: async (data) => {
+        onSubmit: async (values) => {
             if(formik.dirty) {
-                await props.handleEdit(data);
+                await props.handleEdit(values);
             }
             setEditing(false)
         },
