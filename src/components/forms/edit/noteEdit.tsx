@@ -1,92 +1,138 @@
-import React, {useCallback, useState} from "react";
-import {useFormik} from "formik";
-import cn from "classnames";
-import * as yup from "yup";
-import {IHandleSubmit, INote} from "../../../../models";
-import style from './noteEdit.module.scss';
+import React, { useCallback, useState } from 'react'
+import { useFormik } from 'formik'
+import cn from 'classnames'
+import * as yup from 'yup'
+import { IHandleSubmit, INote } from '../../../../models'
+import style from './noteEdit.module.scss'
+import styleForm from '../create/form.module.scss'
 
 const validateSchema = yup.object().shape({
-    name: yup.string().trim().required(),
-    phone: yup.number().required()
+  name: yup.string().trim().required('field is required').min(2),
+  phone: yup.number().required('field is required'),
 })
 
 interface Props {
-    note: INote,
-    handleEdit: IHandleSubmit<INote>,
-    handleDelete: IHandleSubmit<INote>
+  note: INote
+  handleEdit: IHandleSubmit<INote>
+  handleDelete: IHandleSubmit<INote>
 }
 
-function NoteEdit(props: Props): JSX.Element {
-    const [editing, setEditing] = useState(false);
+function NoteEdit({ handleDelete, handleEdit, note }: Props): JSX.Element {
+  const [editing, setEditing] = useState(false)
 
-    const handleEdit = useCallback(() => {
-        setEditing(true)
-    }, []);
+  const onEdit = useCallback(() => {
+    setEditing(true)
+  }, [])
 
-    const formik = useFormik({
-        initialValues: props.note,
-        onSubmit: async (data) => {
-            if(formik.dirty) {
-                await props.handleEdit(data);
-            }
-            setEditing(false)
-        },
-        validationSchema: validateSchema
-    })
+  const formik = useFormik({
+    initialValues: note,
+    onSubmit: async (data) => {
+      if (formik.dirty) {
+        await handleEdit(data)
+      }
+      setEditing(false)
+    },
+    validationSchema: validateSchema,
+  })
 
-    const handleDelete = () => {
-        const onDelete = async () => {
-            formik.setSubmitting(true);
-            await props.handleDelete(props.note);
-            formik.setSubmitting(false);
-        }
-        onDelete();
+  const onDelete = () => {
+    const handler = async () => {
+      formik.setSubmitting(true)
+      await handleDelete(note)
+      formik.setSubmitting(false)
     }
+    handler()
+  }
 
-    return <form className={style.note} >
-        <div className={cn(style.formField, style.formFieldName)}>
-            <input
-                type="text"
-                name='name'
-                value={formik.values.name}
-                data-testid='form-field-name'
-                className={style.field}
-                disabled={!editing}
-                onChange={formik.handleChange}
-                placeholder='Name'
-            />
-            {formik.errors.name && formik.touched.name}
-        </div>
-        <div className={cn(style.formField, style.formFieldPhone)}>
-            <input
-                type="number"
-                name='phone'
-                value={formik.values.phone}
-                data-testid='form-field-phone'
-                className={style.field}
-                disabled={!editing}
-                onChange={formik.handleChange}
-                placeholder='Phone number'
-            />
-            {formik.errors.phone && formik.touched.phone && formik.errors.phone}
-        </div>
-        <div className={cn(style.formField, style.formButtons)}>
+  return (
+    <form className={style.note} data-testid="note" data-testkey={note.id}>
+      <div className={cn(style.formField, style.formFieldName)}>
+        <input
+          type="text"
+          name="name"
+          value={formik.values.name}
+          data-testid="note-field-name"
+          className={style.field}
+          disabled={!editing}
+          onChange={formik.handleChange}
+          placeholder="Name"
+          aria-label="name"
+          aria-errormessage="note-error-name"
+          aria-disabled={!!formik.errors?.name}
+        />
+        {formik.errors.name && formik.touched.name && (
+          <span className={styleForm.fieldError} id="note-error-name">
+            {formik.errors.name}
+          </span>
+        )}
+      </div>
+      <div className={cn(style.formField, style.formFieldPhone)}>
+        <input
+          type="number"
+          name="phone"
+          value={formik.values.phone}
+          data-testid="note-field-phone"
+          className={style.field}
+          disabled={!editing}
+          onChange={formik.handleChange}
+          placeholder="Phone number"
+          aria-label="phone"
+          aria-errormessage="note-error-phone"
+          aria-invalid={!!formik.errors?.phone}
+        />
+        {formik.errors.phone && formik.touched.phone && (
+          <span className={styleForm.fieldError} id="note-error-phone">
+            {formik.errors.phone}
+          </span>
+        )}
+      </div>
+      <div className={cn(style.formField, style.formButtons)}>
+        {editing ? (
+          <>
             <button
-                type='button'
-                data-testid='submit-form'
-                className={style.btn}
-                disabled={formik.isSubmitting}
-                onClick={editing ? formik.submitForm : handleEdit}
-            >{ editing ? 'save' : 'edit' }</button>
+              type="button"
+              data-testid="btn-save"
+              className={style.btn}
+              disabled={formik.isSubmitting}
+              onClick={formik.submitForm}
+            >
+              save
+            </button>
             <button
-                type='button'
-                data-testid='clear-form'
-                className={style.btn}
-                disabled={formik.isSubmitting}
-                onClick={editing ? formik.handleReset : handleDelete}
-            >{ editing ? 'reset' : 'remove' }</button>
-        </div>
+              type="button"
+              data-testid="btn-reset"
+              className={style.btn}
+              disabled={formik.isSubmitting}
+              onClick={formik.handleReset}
+            >
+              reset
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              data-testid="btn-edit"
+              className={style.btn}
+              disabled={formik.isSubmitting}
+              onClick={onEdit}
+            >
+              edit
+            </button>
+            <button
+              type="button"
+              data-testid="btn-delete"
+              className={style.btn}
+              disabled={formik.isSubmitting}
+              onClick={onDelete}
+            >
+              remove
+            </button>
+          </>
+        )}
+      </div>
     </form>
+  )
 }
 
-export default NoteEdit;
+export default NoteEdit

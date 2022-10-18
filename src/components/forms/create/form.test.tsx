@@ -1,22 +1,85 @@
-import {cleanup, fireEvent, render} from '@testing-library/react';
-// import axios from 'axios';
-import {Form} from './form';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  act,
+  waitFor,
+} from '@testing-library/react'
+import { Form } from './form'
+import note from '../../../../__fixtures__/note.json'
 
-afterEach(cleanup);
+afterEach(cleanup)
 
-const testName = 'Artem';
-const testPhone = '38096 777 22 55';
+const createHandle = (t = 200) =>
+  jest.fn(async () => {
+    const promise = new Promise((resolve) => {
+      setTimeout(resolve, t)
+    })
+    return promise
+  })
 
-jest.mock('axios')
+describe('testing form', () => {
+  it('show error messages', async () => {
+    const handleDelete = createHandle()
+    await act(() => {
+      render(<Form onSubmit={handleDelete} />)
+    })
+    expect(screen.queryByText(/field is required/i)).toBeNull()
+    await act(() => {
+      fireEvent.click(screen.getByTestId('submit-form'))
+    })
+    const fieldName = screen.getByTestId('form-field-name')
+    const fieldPhone = screen.getByTestId('form-field-phone')
 
-test('form', () => {
-    const {queryByLabelText, getByTestId} = render(<Form onSubmit={() => {}}/>);
-    const name = getByTestId(/form-field-name/i)
-    const phone = getByTestId(/form-field-phone/i)
-    fireEvent.paste(name, testName)
-    fireEvent.paste(phone, testPhone)
+    expect(fieldName).toHaveErrorMessage(/field is required/i)
+    expect(fieldPhone).toHaveErrorMessage(/field is required/i)
+    expect(handleDelete).toHaveBeenCalledTimes(0)
+  })
 
-    fireEvent.click(getByTestId(/submit-form/i));
+  it('success send form', async () => {
+    const handleSubmit = createHandle(500)
+    await act(() => {
+      render(<Form onSubmit={handleSubmit} />)
+    })
+    const fieldName = screen.getByTestId(/form-field-name/i)
+    const fieldPhone = screen.getByTestId(/form-field-phone/i)
+    const btnSubmit = screen.getByTestId('submit-form')
 
-    expect(queryByLabelText(/on/i)).toBeTruthy();
+    fireEvent.change(fieldName, { target: { value: note.name } })
+    fireEvent.change(fieldPhone, { target: { value: note.phone } })
+
+    expect(btnSubmit).not.toBeDisabled()
+
+    await act(() => {
+      fireEvent.click(screen.getByTestId(/submit-form/i))
+    })
+    expect(fieldName).not.toHaveErrorMessage(/field is required/i)
+    expect(fieldPhone).not.toHaveErrorMessage(/field is required/i)
+    expect(handleSubmit).toHaveBeenCalledTimes(1)
+
+    expect(btnSubmit).toBeDisabled()
+  })
+
+  it('clear form after submit', async () => {
+    const handleDelete = createHandle(500)
+    await act(() => {
+      render(<Form onSubmit={handleDelete} />)
+    })
+    const fieldName = screen.getByTestId(/form-field-name/i)
+    const fieldPhone = screen.getByTestId(/form-field-phone/i)
+
+    fireEvent.change(fieldName, { target: { value: note.name } })
+    fireEvent.change(fieldPhone, { target: { value: note.phone } })
+
+    await act(() => {
+      fireEvent.click(screen.getByTestId('submit-form'))
+    })
+
+    await waitFor(() => {
+      expect(handleDelete).toHaveBeenCalledTimes(1)
+      expect(fieldPhone).toHaveValue(null)
+      expect(fieldName).toHaveValue('')
+    })
+  })
 })
